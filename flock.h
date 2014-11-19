@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
-#include "utils.c"
 
 #define NUMCYCLES 500
+
+#define NUM_THREADS 128
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */
@@ -24,5 +25,8 @@ void applyNeighborForce(float *, int);
 void loadBoids(FILE *, float *, int);
 void dumpBoids(float *, int);
 void dumpAccs(float *, int);
+
+__global__ void cuUpdateFlock(float *, int);
+__global__ void cuApplyNeighborForce(float *, int);
 
 #endif
