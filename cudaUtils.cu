@@ -1,7 +1,10 @@
-#include "flock.h"
+/*
+ * Filename: cudaUtils.cu
+ * This file is for the GPU version of the flock simulations
+ */
 
+#include "flock.h"
 // void updateFlock(float * b, int NP)
-//
 // compute new positions and velocities of flocking points
 // b (input/output): array of positions/velocities/accelerations
 // NP (input): number of points
