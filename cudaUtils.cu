@@ -1,5 +1,10 @@
+/*
+ * Filename: cudaUtils.cu
+ * This file is for the GPU version of the flock simulations
+ */
+
 #include "flock.h"
-// void updateFlock(float * b, int NP)
+// void updateFlockKernel(float * b, int NP)
 //
 // compute new positions and velocities of flocking points
 // b (input/output): array of positions/velocities/accelerations
@@ -8,7 +13,8 @@
 // reads velocities and accelerations
 // writes positions and velocities 
 
-void updateFlock(float * b, int NP) {
+__global__
+void updateFlockKernel(float * b, int NP){
   int i;
   for (i=0; i<NP; i++) {
     pos(b, i, 0, NP) += vel(b, i, 0, NP);
@@ -29,7 +35,8 @@ void updateFlock(float * b, int NP) {
 // reads positions and velocities 
 // writes accelerations
 
-void applyNeighborForce(float *b, int NP) {
+__global__
+void applyNeighborForceKernel(float *b, int NP) {
 
   int i, j;
   for (i=0; i<NP; i++) {
@@ -40,6 +47,8 @@ void applyNeighborForce(float *b, int NP) {
     for (j=0; j<NP; j++) {
       if (i==j) continue;
       float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
+      sqX *= sqX;
+      float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
       sqY *= sqY;
       
       float diff = sqrt(sqX + sqY);
@@ -76,6 +85,7 @@ void applyNeighborForce(float *b, int NP) {
     acc(b, i, 1, NP) += sumY;
   }
 }
+
 
 void loadBoids(FILE *fp, float *b, int NP) {
   int i, dummy, temp;
