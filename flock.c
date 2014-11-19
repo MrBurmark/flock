@@ -3,7 +3,7 @@
     flock.c
 
     Description: simple flocking simulation
-    Compile: gcc flock.c -O3 -o flock -lm
+    Compile: gcc flock.c utils.c -O3 -o flock -lm
     Use: ./flock [input file]
 
 ***********************/
