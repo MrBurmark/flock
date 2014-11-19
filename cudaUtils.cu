@@ -1,4 +1,5 @@
 #include "flock.h"
+
 // void updateFlock(float * b, int NP)
 //
 // compute new positions and velocities of flocking points
@@ -8,7 +9,7 @@
 // reads velocities and accelerations
 // writes positions and velocities 
 
-void updateFlock(float * b, int NP) {
+__global__ void cuUpdateFlock(float * b, int NP) {
   int i;
   for (i=0; i<NP; i++) {
     pos(b, i, 0, NP) += vel(b, i, 0, NP);
@@ -29,7 +30,7 @@ void updateFlock(float * b, int NP) {
 // reads positions and velocities 
 // writes accelerations
 
-void applyNeighborForce(float *b, int NP) {
+__global__ void cuApplyNeighborForce(float *b, int NP) {
 
   int i, j;
   for (i=0; i<NP; i++) {
@@ -75,45 +76,4 @@ void applyNeighborForce(float *b, int NP) {
     acc(b, i, 0, NP) += sumX;
     acc(b, i, 1, NP) += sumY;
   }
-}
-
-void loadBoids(FILE *fp, float *b, int NP) {
-  int i, dummy, temp;
-  float tx, ty;
-
-  for (i=0; i<NP; i++) {
-    temp = fscanf(fp, "%d%f%f", &dummy, &tx, &ty);
-    if (temp != 3) {
-      printf("Error! Input file format incorrect\n");
-      return;
-    }
-    pos(b, i, 0, NP) = tx;
-    pos(b, i, 1, NP) = ty;
-  }
-}
-
-void dumpBoids(float *b, int NP) {
-
-  FILE *fp = fopen("dump.out", "w");
-  float x, y;
-  int i;
-  for (i=0; i<NP; i++) {
-    x = pos(b, i, 0, NP);
-    y = pos(b, i, 1, NP);
-    fprintf(fp, "%d %f %f\n", i, x, y);
-  }
-  fclose(fp);
-}
-
-void dumpAccs(float *b, int NP) {
-
-  FILE *fp = fopen("dumpAcc.out", "w");
-  float x, y;
-  int i;
-  for (i=0; i<NP; i++) {
-    x = acc(b, i, 0, NP);
-    y = acc(b, i, 1, NP);
-    fprintf(fp, "%d %f %f\n", i, x, y);
-  }
-  fclose(fp);
 }
