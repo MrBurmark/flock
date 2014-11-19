@@ -1,7 +1,11 @@
+#ifndef FLOCK_H
+#define FLOCK_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
+#include "utils.c"
 
 #define NUMCYCLES 500
 
@@ -20,3 +24,5 @@ void applyNeighborForce(float *, int);
 void loadBoids(FILE *, float *, int);
 void dumpBoids(float *, int);
 void dumpAccs(float *, int);
+
+#endif
