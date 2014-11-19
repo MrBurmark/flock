@@ -1,20 +1,22 @@
 /**
 AUTHOR: Moses Lee, Jason Burmark, Rachel Beasley
 
-COMPILE: nvcc cuflock.cu utils.c cudaUtils.cu -o cuflock -O3 -lm -arch=compute_20 -code=sm_20,sm_30,sm_35 
+COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -arch=compute_20 -code=sm_20,sm_30,sm_35 
 
 **/
 
 #include <stdio.h>
+#include "flock.h"
 #include "utils.c"
 #include "cudaUtils.cu"
+
+__global__ void cuUpdateFlock(float *, int);
+__global__ void cuApplyNeighborForce(float *, int);
 
 int main(int argc, char** argv)
 {
 	int i;
 	int ok;
-    cudaEvent_t start, stop;
-    float time;
     float *h_boids, *d_boids;
     struct timeval tv;
     double t0, t1, t2;
@@ -30,6 +32,7 @@ int main(int argc, char** argv)
 	// read input file of initial conditions
 	fp = fopen(argv[1], "r");
 	ok = fscanf(fp, "%d", &nPoints);
+	if (ok != 1) printf("Uh-oh\n");
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
 	h_boids = (float *) calloc(nPoints*6, sizeof(float));
 	loadBoids(fp, h_boids, nPoints);
@@ -73,7 +76,7 @@ int main(int argc, char** argv)
 		updateFlockTime, applyNeighborForceTime, t2-t0);
 
 	// dump positions of points
-	dumpBoids(boids, nPoints);
+	dumpBoids(h_boids, nPoints);
 
     // clean up memory
     free(h_boids);
