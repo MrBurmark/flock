@@ -4,13 +4,7 @@
  */
 
 #include "flock.h"
-<<<<<<< HEAD
-// void updateFlockKernel(float * b, int NP)
-=======
-
 // void updateFlock(float * b, int NP)
->>>>>>> 42c508476c0162a6291ed67f2b59d4f3bca2f2f3
-//
 // compute new positions and velocities of flocking points
 // b (input/output): array of positions/velocities/accelerations
 // NP (input): number of points
@@ -18,12 +12,7 @@
 // reads velocities and accelerations
 // writes positions and velocities 
 
-<<<<<<< HEAD
-__global__
-void updateFlockKernel(float * b, int NP){
-=======
 __global__ void cuUpdateFlock(float * b, int NP) {
->>>>>>> 42c508476c0162a6291ed67f2b59d4f3bca2f2f3
   int i;
   for (i=0; i<NP; i++) {
     pos(b, i, 0, NP) += vel(b, i, 0, NP);
@@ -44,13 +33,7 @@ __global__ void cuUpdateFlock(float * b, int NP) {
 // reads positions and velocities 
 // writes accelerations
 
-<<<<<<< HEAD
-__global__
-void applyNeighborForceKernel(float *b, int NP) {
-=======
 __global__ void cuApplyNeighborForce(float *b, int NP) {
->>>>>>> 42c508476c0162a6291ed67f2b59d4f3bca2f2f3
-
   int i, j;
   for (i=0; i<NP; i++) {
     acc(b, i, 0, NP) = 0.;
