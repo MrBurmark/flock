@@ -183,7 +183,7 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
 		float g_x;
 		float g_y;
     printf("Listing first %d Differences > %.6f...\n", iListLength, fListTol);
-    int i,j,k,u;
+    int i,j,u;
     int error_count=0;
         u = 1;
         for (i = 0; i < iListLength; i++) 
@@ -192,8 +192,7 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
 						h_y = pos(data1, i, 1, iListLength);
 						g_x = pos(data2, i, 0, iListLength);
 						g_y = pos(data2, i, 1, iListLength);
-						printf("h_x: %f\n", h_x);
-						printf("g_x: %f\n", g_x);
+
 						
             float fDiff = fabs(h_x - g_x) / g_x;
 
@@ -206,6 +205,21 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
                         printf("\n  Row %d:\n", j);
                     }
                     printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_x, g_x, fDiff);
+                    u = 0;
+                }
+                error_count++;
+            }
+
+					 fDiff = fabs(h_y - g_y) / g_y;
+						if (fDiff > fListTol || isnan(fDiff)) 
+            {                
+                if (error_count < iListLength)
+                {
+                    if (u)
+                    {
+                        printf("\n  Row %d:\n", j);
+                    }
+                    printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_y, g_y, fDiff);
                     u = 0;
                 }
                 error_count++;

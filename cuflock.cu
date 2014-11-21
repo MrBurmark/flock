@@ -9,7 +9,7 @@ COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -arch=compute_20 -code=sm_20
 #include "flock.h"
 #include "utils.c"
 #include "cudaUtils.cu"
-int nPoints;
+//int nPoints;
 
 __global__ void cuUpdateFlock(float *, int);
 __global__ void cuApplyNeighborForce(float *, int);
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 	dumpBoids(h_boids, nPoints);
 
 	computeGold(g_boids, nPoints);
-	printDiff(h_boids, g_boids, nPoints, .03);
+	printDiff(h_boids, g_boids, nPoints, .01);
     // clean up memory
     free(h_boids);
 		free(g_boids);
