@@ -16,6 +16,8 @@ __global__ void cuUpdateFlock(float * b, int NP) {
 
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
+	if (i >= NP) return;
+
 	pos(b, i, 0, NP) += vel(b, i, 0, NP);
 	pos(b, i, 1, NP) += vel(b, i, 1, NP);
 
@@ -45,6 +47,8 @@ __global__ void cuApplyNeighborForce(float *b, int NP) {
 	float amp;
 	const float maxVel = 4.0f, maxForce = 0.03f;
 	float f;
+
+	if (i >= NP) return;
 
 	for (j=0; j<NP; j++) {
 		if (i==j) continue;
