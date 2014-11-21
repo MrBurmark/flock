@@ -1,5 +1,5 @@
 
-#include "flock.h"
+#include "flock_host.h"
 
 // void updateFlock(float * b, int NP)
 //
@@ -10,7 +10,7 @@
 // reads velocities and accelerations
 // writes positions and velocities 
 
-/*void updateFlock(float * b, int NP) {
+void updateFlock(float * b, int NP) {
   int i;
   for (i=0; i<NP; i++) {
 	pos(b, i, 0, NP) += vel(b, i, 0, NP);
@@ -80,7 +80,7 @@ void applyNeighborForce(float *b, int NP) {
 	acc(b, i, 0, NP) += sumX;
 	acc(b, i, 1, NP) += sumY;
   }
-}*/
+}
 
 void loadBoids(FILE *fp, float *b, int NP) {
   int i, dummy, temp;
@@ -99,7 +99,7 @@ void loadBoids(FILE *fp, float *b, int NP) {
 
 void dumpBoids(float *b, int NP) {
 
-  FILE *fp = fopen("dump.out", "w");
+  FILE *fp = fopen("dump_host.out", "w");
   float x, y;
   int i;
   for (i=0; i<NP; i++) {
