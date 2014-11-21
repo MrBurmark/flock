@@ -6,17 +6,20 @@ COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -arch=compute_20 -code=sm_20
 **/
 
 #include <stdio.h>
+#include "flock.h"
 #include "utils.c"
 #include "cudaUtils.cu"
 int nPoints;
+
+__global__ void cuUpdateFlock(float *, int);
+__global__ void cuApplyNeighborForce(float *, int);
 
 int main(int argc, char** argv)
 {
 	int i;
 	int ok;
-    cudaEvent_t start, stop;
-    float time;
     float *h_boids, *d_boids, *g_boids;
+
     struct timeval tv;
     double t0, t1, t2;
     double updateFlockTime = 0.0;
@@ -31,6 +34,7 @@ int main(int argc, char** argv)
 	// read input file of initial conditions
 	fp = fopen(argv[1], "r");
 	ok = fscanf(fp, "%d", &nPoints);
+	if (ok != 1) printf("Uh-oh\n");
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
 	h_boids = (float *) calloc(nPoints*6, sizeof(float));
 

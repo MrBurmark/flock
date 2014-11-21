@@ -26,7 +26,6 @@ void loadBoids(FILE *, float *, int);
 void dumpBoids(float *, int);
 void dumpAccs(float *, int);
 
-__global__ void cuUpdateFlock(float *, int);
-__global__ void cuApplyNeighborForce(float *, int);
+int nPoints;
 
 #endif

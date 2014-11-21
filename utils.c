@@ -41,18 +41,18 @@ void applyNeighborForce(float *b, int NP) {
 	float sumX = 0., sumY = 0.;
 	for (j=0; j<NP; j++) {
 	  if (i==j) continue;
-	  float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
-	  sqX *= sqX;
-			float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
-			sqY *= sqY;
+		float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
+		sqX *= sqX;
+		float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
+		sqY *= sqY;
 
 	  
-	  float diff = sqrt(sqX + sqY);
-	  float neighborDist = 50;
-	  if (diff > neighborDist) continue;
-	  sumX += pos(b, j, 0, NP);
-	  sumY += pos(b, j, 1, NP);
-	  count++;
+		float diff = sqrt(sqX + sqY);
+		float neighborDist = 50;
+		if (diff > neighborDist) continue;
+		sumX += pos(b, j, 0, NP);
+		sumY += pos(b, j, 1, NP);
+		count++;
 	}
 	if (count == 0) continue;
 	sumX /= count;
