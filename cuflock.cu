@@ -9,6 +9,7 @@ COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -arch=compute_20 -code=sm_20
 #include "flock.h"
 #include "utils.c"
 #include "cudaUtils.cu"
+//int nPoints;
 
 __global__ void cuUpdateFlock(float *, int);
 __global__ void cuApplyNeighborForce(float *, int);
@@ -17,7 +18,8 @@ int main(int argc, char** argv)
 {
 	int i;
 	int ok;
-    float *h_boids, *d_boids;
+    float *h_boids, *d_boids, *g_boids;
+
     struct timeval tv;
     double t0, t1, t2;
     double updateFlockTime = 0.0;
@@ -35,7 +37,11 @@ int main(int argc, char** argv)
 	if (ok != 1) printf("Uh-oh\n");
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
 	h_boids = (float *) calloc(nPoints*6, sizeof(float));
+
 	loadBoids(fp, h_boids, nPoints);
+
+	g_boids = (float *) calloc(nPoints*6, sizeof(float));
+	memcpy(g_boids, h_boids, (nPoints * 6) * sizeof(float));
 
     // allocate device memory
     cudaMalloc((void**) &d_boids, nPoints*6 * sizeof(float));
@@ -78,8 +84,11 @@ int main(int argc, char** argv)
 	// dump positions of points
 	dumpBoids(h_boids, nPoints);
 
+	computeGold(g_boids, nPoints);
+	printDiff(h_boids, g_boids, nPoints, .01);
     // clean up memory
     free(h_boids);
+		free(g_boids);
     cudaFree(d_boids);
 
     cudaThreadExit();

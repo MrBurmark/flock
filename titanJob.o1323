@@ -1,0 +1,42 @@
+------------------------------------------------------
+Job is running on node tiger
+------------------------------------------------------
+PBS: qsub is running on tiger
+PBS: originating queue is titan
+PBS: executing queue is titan
+PBS: working directory is /home/csc746.mlee/hpc_p6
+PBS: execution mode is PBS_BATCH
+PBS: job identifier is 1323.tiger
+PBS: job name is titanJob
+PBS: node file is /var/spool/torque/aux//1323.tiger
+PBS: gpu file is /var/spool/torque/aux//1323.tigergpu
+PBS: current home directory is /home/csc746.mlee
+PBS: PATH = /home/csc746.mlee/bin:/usr/local/bin:/usr/bin:/bin:/opt/bin:/usr/x86_64-pc-linux-gnu/gcc-bin/4.8.3:/opt/nvidia-cg-toolkit/bin:/opt/cuda/bin
+env: CUDA_VISIBLE_DEVICES = 0
+------------------------------------------------------
+Fri Nov 21 15:58:07 PST 2014
+Cuda - 1024 points, 128 threads
+updateFlock: 8379.000000 applyNeighborForce 261894.000000 total 270349.000000
+Listing first 1024 Differences > 0.010000...
+
+  Row 0:
+    Loc(92,0)	CPU=656.32239	GPU=644.21362	Diff=0.018796
+    Loc(147,0)	CPU=439.17163	GPU=445.66589	Diff=0.014572
+    Loc(147,0)	CPU=479.36603	GPU=472.42795	Diff=0.014686
+    Loc(187,0)	CPU=454.87143	GPU=447.70883	Diff=0.015998
+    Loc(192,0)	CPU=474.21857	GPU=469.09665	Diff=0.010919
+    Loc(193,0)	CPU=333.13846	GPU=328.75388	Diff=0.013337
+    Loc(377,0)	CPU=441.68433	GPU=450.63544	Diff=0.019863
+    Loc(413,0)	CPU=418.15335	GPU=412.79599	Diff=0.012978
+    Loc(427,0)	CPU=417.37540	GPU=412.75372	Diff=0.011197
+    Loc(462,0)	CPU=464.98270	GPU=459.93994	Diff=0.010964
+    Loc(503,0)	CPU=456.59695	GPU=441.43283	Diff=0.034352
+    Loc(780,0)	CPU=443.34100	GPU=437.06882	Diff=0.014351
+    Loc(839,0)	CPU=447.24933	GPU=440.23965	Diff=0.015922
+    Loc(914,0)	CPU=471.31302	GPU=478.40942	Diff=0.014833
+    Loc(917,0)	CPU=472.76456	GPU=467.60449	Diff=0.011035
+    Loc(929,0)	CPU=479.80075	GPU=465.23703	Diff=0.031304
+ 
+  Total Errors = 16
+
+Fri Nov 21 15:58:13 PST 2014

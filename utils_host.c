@@ -1,5 +1,5 @@
 
-#include "flock.h"
+#include "flock_host.h"
 
 // void updateFlock(float * b, int NP)
 //
@@ -10,7 +10,7 @@
 // reads velocities and accelerations
 // writes positions and velocities 
 
-/*void updateFlock(float * b, int NP) {
+void updateFlock(float * b, int NP) {
   int i;
   for (i=0; i<NP; i++) {
 	pos(b, i, 0, NP) += vel(b, i, 0, NP);
@@ -41,18 +41,18 @@ void applyNeighborForce(float *b, int NP) {
 	float sumX = 0., sumY = 0.;
 	for (j=0; j<NP; j++) {
 	  if (i==j) continue;
-		float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
-		sqX *= sqX;
-		float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
-		sqY *= sqY;
+	  float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
+	  sqX *= sqX;
+			float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
+			sqY *= sqY;
 
 	  
-		float diff = sqrt(sqX + sqY);
-		float neighborDist = 50;
-		if (diff > neighborDist) continue;
-		sumX += pos(b, j, 0, NP);
-		sumY += pos(b, j, 1, NP);
-		count++;
+	  float diff = sqrt(sqX + sqY);
+	  float neighborDist = 50;
+	  if (diff > neighborDist) continue;
+	  sumX += pos(b, j, 0, NP);
+	  sumY += pos(b, j, 1, NP);
+	  count++;
 	}
 	if (count == 0) continue;
 	sumX /= count;
@@ -80,7 +80,7 @@ void applyNeighborForce(float *b, int NP) {
 	acc(b, i, 0, NP) += sumX;
 	acc(b, i, 1, NP) += sumY;
   }
-}*/
+}
 
 void loadBoids(FILE *fp, float *b, int NP) {
   int i, dummy, temp;
@@ -99,7 +99,7 @@ void loadBoids(FILE *fp, float *b, int NP) {
 
 void dumpBoids(float *b, int NP) {
 
-  FILE *fp = fopen("dump.out", "w");
+  FILE *fp = fopen("dump_host.out", "w");
   float x, y;
   int i;
   for (i=0; i<NP; i++) {
