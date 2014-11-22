@@ -57,7 +57,11 @@ int main(int argc, char** argv)
 	t0 = tv.tv_sec*1e6 + tv.tv_usec;
 
     // copy host memory to device
+#if !DOUBLEBUFFER
     cudaMemcpy(d_boidsB, h_boids, nPoints*6 * sizeof(float), cudaMemcpyHostToDevice);
+#else
+    cudaMemcpy(d_boidsB, h_boids, nPoints*4 * sizeof(float), cudaMemcpyHostToDevice);
+#endif
 
 	gettimeofday(&tv, NULL);
 	t2 = tv.tv_sec*1e6 + tv.tv_usec;
@@ -102,8 +106,8 @@ int main(int argc, char** argv)
 	d_boidsB = tmpPtr;
 #endif
 
-#if !DOUBLEBUFFER
 	// copy host memory to device
+#if !DOUBLEBUFFER
     cudaMemcpy(h_boids, d_boidsB, nPoints*6 * sizeof(float), cudaMemcpyDeviceToHost);
 #else
     cudaMemcpy(h_boids, d_boidsB, nPoints*4 * sizeof(float), cudaMemcpyDeviceToHost);
