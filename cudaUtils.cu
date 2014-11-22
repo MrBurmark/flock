@@ -227,6 +227,8 @@ __global__ void cuUpdateApplyNeighborWarpReduce(float *a, float * b, int NP) {
 		count++;
 	}
 
+	// inspired largely from the cuda c programming guide
+	// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#warp-shuffle-functions
 	for (j=WARPSIZE/2;j>=1;j/=2)
 		sumX += __shfl_xor(sumX, j, WARPSIZE);
 	for (j=WARPSIZE/2;j>=1;j/=2)
