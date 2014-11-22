@@ -10,6 +10,18 @@
 #define NUMCYCLES 500
 #endif
 
+#ifndef DOUBLEBUFFER
+#define DOUBLEBUFFER 1
+#endif
+
+#ifndef DUMP
+#define DUMP 0
+#endif
+
+#ifndef CHECK
+#define CHECK 1
+#endif
+
 #ifndef NUM_THREADS
 #define NUM_THREADS 128
 #endif
@@ -29,7 +41,8 @@ void applyNeighborForce(float *, int);
 void loadBoids(FILE *, float *, int);
 void dumpBoids(float *, int);
 void dumpAccs(float *, int);
-
-int nPoints;
+void printresults(float *, int);
+void computeGold(float *, int);
+void printDiff(float *, float *, int, float);
 
 #endif
