@@ -13,6 +13,7 @@ DESCRIPTION: Runs a simple flocking simulation on the GPU
 __global__ void cuUpdateFlock(float *, int);
 __global__ void cuApplyNeighborForce(float *, int);
 __global__ void cuUpdateApplyNeighbor(float *, float *, int);
+__global__ void cuUpdateApplyNeighborWarpReduce(float *, float *, int);
 
 int main(int argc, char** argv)
 {
@@ -39,6 +40,17 @@ int main(int argc, char** argv)
 	fp = fopen(argv[1], "r");
 	ok = fscanf(fp, "%d", &nPoints);
 	if (ok != 1) printf("Couldn't read nPoints\n");
+
+#if MANMEM
+	printf("Managed Memory - ");
+#endif
+#if DOUBLEBUFFER
+	printf("Double Buffered - ");
+#if WARP
+	printf("Warp Reduction %i - ", WARPSIZE);
+#endif
+#endif
+	printf("Num Cycles %i - ", NUMCYCLES);
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
 
 #if !MANMEM
@@ -101,8 +113,11 @@ int main(int argc, char** argv)
 		applyNeighborForceTime += t2 - t1;
 
 #else
+#if !WARP
 		cuUpdateApplyNeighbor<<<ceil(nPoints / (double)NUM_THREADS), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
-
+#else
+		cuUpdateApplyNeighborWarpReduce<<<ceil(nPoints / (double)(NUM_THREADS / WARPSIZE)), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
+#endif
 		// swap buffers
 		tmpPtr = d_boidsA;
 		d_boidsA = d_boidsB;

@@ -1,0 +1,16 @@
+Test results:
+740M
+500 cycles
+in1024
+
+Original Kernels:
+Explicit Copy		64-128 threads					~ 188ms
+Managed Memory 		32-1024 threads					~ 189ms
+
+Double Buffer Kernel:
+Explicit Copy		64-128 threads					~ 186ms
+Managed Memory 		32-1024 threads					~ 187ms
+
+Double Buffer Warp Reduce Kernel:
+Explicit Copy		512 threads - 4 per warp		~ 55ms
+Managed Memory 		512 threads - 4 per warp		~ 56ms

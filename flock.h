@@ -9,20 +9,26 @@
 #ifndef NUMCYCLES
 #define NUMCYCLES 500
 #endif
-#ifndef DOUBLEBUFFER
-#define DOUBLEBUFFER 1
-#endif
 #ifndef DUMP
 #define DUMP 0
 #endif
 #ifndef CHECK
-#define CHECK 1
+#define CHECK 0
 #endif
 #ifndef MANMEM
 #define MANMEM 0
 #endif
+#ifndef DOUBLEBUFFER
+#define DOUBLEBUFFER 1
+#endif
+#ifndef WARP // will not compile if architecture not 30 or higher with this option
+#define WARP 1 // requires DOUBLEBUFFER
+#endif
+#ifndef WARPSIZE
+#define WARPSIZE 4 // power of 2, <= 32, evenly divides NUM_THREADS
+#endif
 #ifndef NUM_THREADS
-#define NUM_THREADS 128
+#define NUM_THREADS 512 // 128 good for most, 512 best for warp
 #endif
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
