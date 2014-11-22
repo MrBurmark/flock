@@ -9,19 +9,18 @@
 #ifndef NUMCYCLES
 #define NUMCYCLES 500
 #endif
-
 #ifndef DOUBLEBUFFER
 #define DOUBLEBUFFER 1
 #endif
-
 #ifndef DUMP
 #define DUMP 0
 #endif
-
 #ifndef CHECK
 #define CHECK 1
 #endif
-
+#ifndef MANMEM
+#define MANMEM 0
+#endif
 #ifndef NUM_THREADS
 #define NUM_THREADS 128
 #endif

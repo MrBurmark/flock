@@ -38,29 +38,46 @@ int main(int argc, char** argv)
 	// read input file of initial conditions
 	fp = fopen(argv[1], "r");
 	ok = fscanf(fp, "%d", &nPoints);
-	if (ok != 1) printf("Uh-oh\n");
+	if (ok != 1) printf("Couldn't read nPoints\n");
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
+
+#if !MANMEM
 	h_boids = (float *) calloc(nPoints*6, sizeof(float));
 
 	loadBoids(fp, h_boids, nPoints);
-
-	g_boids = (float *) calloc(nPoints*6, sizeof(float));
-	memcpy(g_boids, h_boids, (nPoints * 6) * sizeof(float));
 
     // allocate device memory
     cudaMalloc((void**) &d_boidsB, nPoints*6 * sizeof(float));
 #if DOUBLEBUFFER
     cudaMalloc((void**) &d_boidsA, nPoints*6 * sizeof(float));
 #endif
+#else
+    // allocate managed device memory
+    cudaMallocManaged((void**) &d_boidsB, nPoints*6 * sizeof(float));
+    memset(d_boidsB, 0, nPoints*6 * sizeof(float));
+
+    h_boids = d_boidsB;
+
+    loadBoids(fp, d_boidsB, nPoints);
+
+#if DOUBLEBUFFER
+    cudaMallocManaged((void**) &d_boidsA, nPoints*6 * sizeof(float));
+#endif
+#endif
+
+    g_boids = (float *) calloc(nPoints*6, sizeof(float));
+	memcpy(g_boids, h_boids, (nPoints * 6) * sizeof(float));
 
     gettimeofday(&tv, NULL);
 	t0 = tv.tv_sec*1e6 + tv.tv_usec;
 
+#if !MANMEM
     // copy host memory to device
 #if !DOUBLEBUFFER
     cudaMemcpy(d_boidsB, h_boids, nPoints*6 * sizeof(float), cudaMemcpyHostToDevice);
 #else
     cudaMemcpy(d_boidsB, h_boids, nPoints*4 * sizeof(float), cudaMemcpyHostToDevice);
+#endif
 #endif
 
 	gettimeofday(&tv, NULL);
@@ -106,11 +123,13 @@ int main(int argc, char** argv)
 	d_boidsB = tmpPtr;
 #endif
 
+#if !MANMEM
 	// copy host memory to device
 #if !DOUBLEBUFFER
     cudaMemcpy(h_boids, d_boidsB, nPoints*6 * sizeof(float), cudaMemcpyDeviceToHost);
 #else
     cudaMemcpy(h_boids, d_boidsB, nPoints*4 * sizeof(float), cudaMemcpyDeviceToHost);
+#endif
 #endif
 
 	gettimeofday(&tv, NULL);
@@ -127,6 +146,8 @@ int main(int argc, char** argv)
 #if DUMP
 	// dump positions of points
 	dumpBoids(h_boids, nPoints);
+#else
+
 #endif
 
 #if CHECK
@@ -135,7 +156,9 @@ int main(int argc, char** argv)
 #endif
 
     // clean up memory
+#if !MANMEM
     free(h_boids);
+#endif
 	free(g_boids);
     cudaFree(d_boidsB);
 #if DOUBLEBUFFER
