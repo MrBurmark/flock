@@ -43,6 +43,7 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 	float sumX = 0.0f, sumY = 0.0f;
 	int count = 0;
 	float sqX, sqY;
+	float posx, posy, jposx, jposy;
 	float diff;
 	const float neighborDist = 50.0f;
 	float amp;
@@ -51,17 +52,25 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 
 	if (i >= NP) return;
 
+	posx = pos(b, i, 0, NP);
+	posy = pos(b, i, 1, NP);
+
 	for (j=0; j<NP; j++) {
+
 		if (i==j) continue;
-		sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
+
+		jposx = pos(b, j, 0, NP);
+		jposy = pos(b, j, 1, NP);
+
+		sqX = posx - jposx;
 		sqX *= sqX;
-		sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
+		sqY = posy - jposy;
 		sqY *= sqY;
 
 		diff = sqX + sqY;
 		if (diff > neighborDist*neighborDist) continue;
-		sumX += pos(b, j, 0, NP);
-		sumY += pos(b, j, 1, NP);
+		sumX += jposx;
+		sumY += jposy;
 		count++;
 	}
 
@@ -71,8 +80,8 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 		sumY /= count;
 
 		// centroid of neighborhood is now sumX, sumY
-		sumX -= pos(b, i, 0, NP);
-		sumY -= pos(b, i, 1, NP);
+		sumX -= posx;
+		sumY -= posy;
 
 		amp = sqrt(sumX * sumX + sumY * sumY);
 		sumX *= maxVel / amp;
@@ -188,10 +197,10 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
         u = 1;
         for (i = 0; i < iListLength; i++) 
         {
-						h_x = pos(data1, i, 0, iListLength);
-						h_y = pos(data1, i, 1, iListLength);
-						g_x = pos(data2, i, 0, iListLength);
-						g_y = pos(data2, i, 1, iListLength);
+			h_x = pos(data1, i, 0, iListLength);
+			h_y = pos(data1, i, 1, iListLength);
+			g_x = pos(data2, i, 0, iListLength);
+			g_y = pos(data2, i, 1, iListLength);
 
 						
             float fDiff = fabs(h_x - g_x) / g_x;
@@ -204,14 +213,15 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
                     {
                         printf("\n  Row %d:\n", j);
                     }
-                    printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_x, g_x, fDiff);
+                    printf("    Locx(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_x, g_x, fDiff);
                     u = 0;
                 }
                 error_count++;
             }
 
-					 fDiff = fabs(h_y - g_y) / g_y;
-						if (fDiff > fListTol || isnan(fDiff)) 
+			fDiff = fabs(h_y - g_y) / g_y;
+			
+			if (fDiff > fListTol || isnan(fDiff)) 
             {                
                 if (error_count < iListLength)
                 {
@@ -219,7 +229,7 @@ void printDiff(float *data1, float *data2, int iListLength, float fListTol)
                     {
                         printf("\n  Row %d:\n", j);
                     }
-                    printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_y, g_y, fDiff);
+                    printf("    Locy(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_y, g_y, fDiff);
                     u = 0;
                 }
                 error_count++;

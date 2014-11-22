@@ -1,7 +1,7 @@
 /**
 AUTHOR: Moses Lee, Jason Burmark, Rachel Beasley
 
-COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -arch=compute_20 -code=sm_20,sm_30,sm_35 
+COMPILE: nvcc cuflock.cu utils.c -o cuflock -O3 -lm -fmad=false -arch=compute_20 -code=sm_20,sm_30,sm_35 
 
 **/
 
@@ -58,14 +58,14 @@ int main(int argc, char** argv)
 	for (i=0; i<NUMCYCLES; i++) {
 
 		cuUpdateFlock<<<ceil(nPoints / (double)NUM_THREADS), NUM_THREADS>>>(d_boids, nPoints);
-		cudaThreadSynchronize();
+		cudaDeviceSynchronize();
 
 		gettimeofday(&tv, NULL);
 		t1 = tv.tv_sec*1e6 + tv.tv_usec;
 		updateFlockTime += t1 - t2;
 
 		cuApplyNeighborForce<<<ceil(nPoints / (double)NUM_THREADS), NUM_THREADS>>>(d_boids, nPoints);
-		cudaThreadSynchronize();
+		cudaDeviceSynchronize();
 
 		gettimeofday(&tv, NULL);
 		t2 = tv.tv_sec*1e6 + tv.tv_usec;

@@ -6,9 +6,13 @@
 #include <math.h>
 #include <sys/time.h>
 
+#ifndef NUMCYCLES
 #define NUMCYCLES 500
+#endif
 
+#ifndef NUM_THREADS
 #define NUM_THREADS 128
+#endif
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */
