@@ -25,11 +25,13 @@
 #define WARP 1 // requires DOUBLEBUFFER
 #endif
 #ifndef WARPSIZE
-#define WARPSIZE 4 // power of 2, <= 32, evenly divides NUM_THREADS
+#define WARPSIZE 16 // power of 2, <= 32, evenly divides NUM_THREADS
 #endif
 #ifndef NUM_THREADS
-#define NUM_THREADS 512 // 128 good for most, 512 best for warp
+#define NUM_THREADS 128 // 128 good for most
 #endif
+
+// see text.txt for fastest configs with different gpus
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */
