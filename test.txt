@@ -5,7 +5,7 @@ in1024
 
 Kernel  ----------  Best Config  -----------------  Time(ms)
 -740M-
-Original Kernels:
+Original Kernel:
 Explicit Copy		64-128 threads					~ 188ms
 Managed Memory 		32-1024 threads					~ 189ms
 
@@ -18,7 +18,7 @@ Explicit Copy		512 threads - 4 per warp		~ 55ms
 Managed Memory 		512 threads - 4 per warp		~ 56ms
 
 -Titan-
-Original Kernels:
+Original Kernel:
 Explicit Copy		512 - threads					~ 206ms
 Managed Memory 		256-512 - threads				~ 210ms
 
