@@ -13,6 +13,10 @@ Double Buffer Kernel:
 Explicit Copy		64-128 threads					~ 186ms
 Managed Memory 		32-1024 threads					~ 187ms
 
+Double Buffer Shared Reduce Kernel:
+Explicit Copy		512 threads - 8 per warp		~ 68ms
+Managed Memory 		512 threads - 8 per warp		~ 69ms
+
 Double Buffer Warp Reduce Kernel:
 Explicit Copy		512 threads - 4 per warp		~ 55ms
 Managed Memory 		512 threads - 4 per warp		~ 56ms

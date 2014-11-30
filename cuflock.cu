@@ -13,6 +13,7 @@ DESCRIPTION: Runs a simple flocking simulation on the GPU
 __global__ void cuUpdateFlock(float *, int);
 __global__ void cuApplyNeighborForce(float *, int);
 __global__ void cuUpdateApplyNeighbor(float *, float *, int);
+__global__ void cuUpdateApplyNeighborWarpReduceShared(float *, float *, int);
 __global__ void cuUpdateApplyNeighborWarpReduce(float *, float *, int);
 
 int main(int argc, char** argv)
@@ -46,7 +47,9 @@ int main(int argc, char** argv)
 #endif
 #if DOUBLEBUFFER
 	printf("Double Buffered - ");
-#if WARP
+#if SHARED
+	printf("Shared Warp Reduction %i - ", WARPSIZE);
+#elif WARP
 	printf("Warp Reduction %i - ", WARPSIZE);
 #endif
 #endif
@@ -115,6 +118,8 @@ int main(int argc, char** argv)
 #else
 #if !WARP
 		cuUpdateApplyNeighbor<<<ceil(nPoints / (double)NUM_THREADS), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
+#elif SHARED
+		cuUpdateApplyNeighborWarpReduceShared<<<ceil(nPoints / (double)(NUM_THREADS / WARPSIZE)), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
 #else
 		cuUpdateApplyNeighborWarpReduce<<<ceil(nPoints / (double)(NUM_THREADS / WARPSIZE)), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
 #endif
