@@ -5,6 +5,7 @@ in1024
 
 -GPU-
 Kernel  ----------  Best Config  -----------------  Time(ms)
+
 -740M-
 Original Kernel:
 Explicit Copy		64-128 threads					~ 188ms
@@ -30,6 +31,10 @@ Managed Memory 		256-512 - threads				~ 210ms
 Double Buffer Kernel:
 Explicit Copy		64-256 - threads				~ 198ms
 Managed Memory 		64-256 - threads				~ 200ms
+
+Double Buffer Shared Reduce Kernel:
+Explicit Copy		256 threads - 16 per warp		~ 25ms
+Managed Memory 		128-512 threads - 16 per warp	~ 27ms
 
 Double Buffer Warp Reduce Kernel:
 Explicit Copy		128-512 threads - 16 per warp	~ 23ms
