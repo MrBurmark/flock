@@ -16,7 +16,7 @@
 #define CHECK 1
 #endif
 #ifndef MANMEM
-#define MANMEM 1
+#define MANMEM 0
 #endif
 #ifndef DOUBLEBUFFER
 #define DOUBLEBUFFER 1
@@ -28,7 +28,7 @@
 #define WARP 1 // requires DOUBLEBUFFER
 #endif
 #ifndef WARPSIZE
-#define WARPSIZE 8 // power of 2, <= 32, evenly divides NUM_THREADS
+#define WARPSIZE 16 // power of 2, <= 32, evenly divides NUM_THREADS
 #endif
 #ifndef NUM_THREADS
 #define NUM_THREADS 128 // 128 good for most

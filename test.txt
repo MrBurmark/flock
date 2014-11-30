@@ -3,6 +3,7 @@ Test results:
 500 cycles
 in1024
 
+-GPU-
 Kernel  ----------  Best Config  -----------------  Time(ms)
 -740M-
 Original Kernel:
