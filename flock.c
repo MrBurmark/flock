@@ -2,18 +2,16 @@
 flock.c
 
 Description: simple flocking simulation
-Compile: gcc flock.c utils_host.c -O3 -o flock -lm
+Compile: gcc flock.c utils.c -O3 -o flock -lm
 Use: ./flock [input file]
 
 ***********************/
 
-#include "flock_host.h"
-
-int nPoints; // number of flocking "birds"
+#include "flock.h"
 
 int main(int argc, char **argv) {
 	float *boids; // array of 2D positions, velocities, accelerations of points
-	int i;
+	int i, nPoints;
 
 	if (argc != 2) {
 		printf("Usage: ./flock [input file]\n");

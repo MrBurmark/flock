@@ -6,9 +6,34 @@
 #include <math.h>
 #include <sys/time.h>
 
+#ifndef NUMCYCLES
 #define NUMCYCLES 500
+#endif
+#ifndef DUMP
+#define DUMP 0
+#endif
+#ifndef CHECK
+#define CHECK 1
+#endif
+#ifndef MANMEM
+#define MANMEM 0
+#endif
+#ifndef DOUBLEBUFFER
+#define DOUBLEBUFFER 1
+#endif
+#ifndef SHARED // takes precedence over WARP
+#define SHARED 1 // requires DOUBLEBUFFER
+#endif
+#ifndef WARP // will not compile if architecture not 30 or higher with this option
+#define WARP 1 // requires DOUBLEBUFFER
+#endif
+#ifndef WARPSIZE
+#define WARPSIZE 16 // power of 2, <= 32, evenly divides NUM_THREADS
+#endif
+#ifndef NUM_THREADS
+#define NUM_THREADS 128 // 128 good for most
+#endif
 
-#define NUM_THREADS 64
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */
@@ -25,7 +50,8 @@ void applyNeighborForce(float *, int);
 void loadBoids(FILE *, float *, int);
 void dumpBoids(float *, int);
 void dumpAccs(float *, int);
-
-int nPoints;
+void printresults(float *, int);
+void computeGold(float *, int);
+void printDiff(float *, float *, int, float);
 
 #endif

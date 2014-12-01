@@ -43,6 +43,7 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 	float sumX = 0.0f, sumY = 0.0f;
 	int count = 0;
 	float sqX, sqY;
+	float posx, posy, jposx, jposy;
 	float diff;
 	const float neighborDist = 50.0f;
 	float amp;
@@ -51,17 +52,25 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 
 	if (i >= NP) return;
 
+	posx = pos(b, i, 0, NP);
+	posy = pos(b, i, 1, NP);
+
 	for (j=0; j<NP; j++) {
+
 		if (i==j) continue;
-		sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
+
+		jposx = pos(b, j, 0, NP);
+		jposy = pos(b, j, 1, NP);
+
+		sqX = posx - jposx;
 		sqX *= sqX;
-		sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
+		sqY = posy - jposy;
 		sqY *= sqY;
 
 		diff = sqX + sqY;
 		if (diff > neighborDist*neighborDist) continue;
-		sumX += pos(b, j, 0, NP);
-		sumY += pos(b, j, 1, NP);
+		sumX += jposx;
+		sumY += jposy;
 		count++;
 	}
 
@@ -71,8 +80,8 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 		sumY /= count;
 
 		// centroid of neighborhood is now sumX, sumY
-		sumX -= pos(b, i, 0, NP);
-		sumY -= pos(b, i, 1, NP);
+		sumX -= posx;
+		sumY -= posy;
 
 		amp = sqrt(sumX * sumX + sumY * sumY);
 		sumX *= maxVel / amp;
@@ -93,138 +102,286 @@ __global__ void cuApplyNeighborForce(float *b, int NP)
 	acc(b, i, 1, NP) = sumY;
 }
 
-//------------------------------------------------------------------
-// For checking solutions
-//------------------------------------------------------------------
+// write buffer a, read buffer b
+// removes necessity for device synchronize between kernels
+// puts updating of birds after finding neighbors
+// removes necessity of storing accelerations
+__global__ void cuUpdateApplyNeighbor(float *a, float * b, int NP) {
 
-void updateFlock(float * b, int NP) {
-  int i;
-  for (i=0; i<NP; i++) {
-	pos(b, i, 0, NP) += vel(b, i, 0, NP);
-	pos(b, i, 1, NP) += vel(b, i, 1, NP);
-
-	vel(b, i, 0, NP) += acc(b, i, 0, NP);
-	vel(b, i, 1, NP) += acc(b, i, 1, NP);
-  }
-}
-
-void applyNeighborForce(float *b, int NP) {
-
-  int i, j;
-  for (i=0; i<NP; i++) {
-	acc(b, i, 0, NP) = 0.;
-	acc(b, i, 1, NP) = 0.;
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int j;
+	float sumX = 0.0f, sumY = 0.0f;
 	int count = 0;
-	float sumX = 0., sumY = 0.;
+	float sqX, sqY;
+	float posx, posy, velx, vely, jposx, jposy;
+	float diff;
+	const float neighborDistSQR = 50.0f * 50.0f;
+	float amp;
+	const float maxVel = 4.0f, maxForce = 0.03f;
+	float f;
+
+	if (i >= NP) return;
+
+	posx = pos(b, i, 0, NP);
+	posy = pos(b, i, 1, NP);
+
 	for (j=0; j<NP; j++) {
-	  if (i==j) continue;
-	  float sqX = pos(b, i, 0, NP) - pos(b, j, 0, NP);
-	  sqX *= sqX;
-			float sqY = pos(b, i, 1, NP) - pos(b, j, 1, NP);
-			sqY *= sqY;
 
-	  
-	  float diff = sqrt(sqX + sqY);
-	  float neighborDist = 50;
-	  if (diff > neighborDist) continue;
-	  sumX += pos(b, j, 0, NP);
-	  sumY += pos(b, j, 1, NP);
-	  count++;
-	}
-	if (count == 0) continue;
-	sumX /= count;
-	sumY /= count;
+		if (i==j) continue;
 
-	// centroid of neighborhood is now sumX, sumY
-	sumX -= pos(b, i, 0, NP);
-	sumY -= pos(b, i, 1, NP);
-	
-	float amp = sqrt(sumX * sumX + sumY * sumY);
-	float maxVel = 4;
-	sumX *= maxVel / amp;
-	sumY *= maxVel / amp;
-	
-	sumX -= vel(b, i, 0, NP);
-	sumY -= vel(b, i, 1, NP);
-	amp = sqrt(sumX * sumX + sumY * sumY);
-	
-	float maxForce = .03;
-	if (amp > maxForce) {
-	  float f = maxForce / amp;
-	  sumX *= f;
-	  sumY *= f;
+		jposx = pos(b, j, 0, NP);
+		jposy = pos(b, j, 1, NP);
+
+		sqX = posx - jposx;
+		sqX *= sqX;
+		sqY = posy - jposy;
+		sqY *= sqY;
+
+		diff = sqX + sqY;
+		if (diff > neighborDistSQR) continue;
+		sumX += jposx;
+		sumY += jposy;
+		count++;
 	}
-	acc(b, i, 0, NP) += sumX;
-	acc(b, i, 1, NP) += sumY;
-  }
+
+	velx = vel(b, i, 0, NP);
+	vely = vel(b, i, 1, NP);
+
+	if (count != 0) {
+
+		sumX /= count;
+		sumY /= count;
+
+		// centroid of neighborhood is now sumX, sumY
+		sumX -= posx;
+		sumY -= posy;
+
+		amp = sqrt(sumX * sumX + sumY * sumY);
+		sumX *= maxVel / amp;
+		sumY *= maxVel / amp;
+
+		sumX -= velx;
+		sumY -= vely;
+		amp = sqrt(sumX * sumX + sumY * sumY);
+
+		if (amp > maxForce) {
+			f = maxForce / amp;
+			sumX *= f;
+			sumY *= f;
+		}
+	}
+
+	posx += velx;
+	posy += vely;
+
+	pos(a, i, 0, NP) = posx;
+	pos(a, i, 1, NP) = posy;	
+
+	velx += sumX;
+	vely += sumY;
+
+	vel(a, i, 0, NP) = velx;
+	vel(a, i, 1, NP) = vely;
 }
 
-void computeGold(float * boids, int nPoints){
-	int i;
+// comments for cuUpdateApplyNeighbor apply
+// gives one boid to one sub-warp and reduces results in shared memory
+__global__ void cuUpdateApplyNeighborWarpReduceShared(float *a, float * b, int NP) {
 
-	for (i=0; i<nPoints; i++) {
-		vel(boids, i, 0, nPoints) = 0.;
-		vel(boids, i, 1, nPoints) = 0.;
-		acc(boids, i, 0, nPoints) = 0.;
-		acc(boids, i, 1, nPoints) = 0.;
+	int i = blockIdx.x * (NUM_THREADS / WARPSIZE) + threadIdx.x / WARPSIZE;
+	int warpId = threadIdx.x % WARPSIZE;
+	int warpNum = threadIdx.x - warpId;
+	int j;
+	float sumX = 0.0f, sumY = 0.0f;
+	int count = 0;
+	float sqX, sqY;
+	float posx, posy, velx, vely, jposx, jposy;
+	float diff;
+	const float neighborDistSQR = 50.0f * 50.0f;
+	float amp;
+	const float maxVel = 4.0f, maxForce = 0.03f;
+	float f;
+	__shared__ float ssumx[NUM_THREADS];
+	__shared__ float ssumy[NUM_THREADS];
+	__shared__ float scount[NUM_THREADS];
+
+	ssumx[threadIdx.x] = 0.0f;
+	ssumy[threadIdx.x] = 0.0f;
+	scount[threadIdx.x] = 0;
+
+	if (i >= NP) return;
+
+	posx = pos(b, i, 0, NP);
+	posy = pos(b, i, 1, NP);
+
+	for (j=warpId; j<NP; j+=WARPSIZE) {
+
+		if (i==j) continue;
+
+		jposx = pos(b, j, 0, NP);
+		jposy = pos(b, j, 1, NP);
+
+		sqX = posx - jposx;
+		sqX *= sqX;
+		sqY = posy - jposy;
+		sqY *= sqY;
+
+		diff = sqX + sqY;
+		if (diff > neighborDistSQR) continue;
+		ssumx[threadIdx.x] += jposx;
+		ssumy[threadIdx.x] += jposy;
+		scount[threadIdx.x]++;
 	}
 
-	for (i=0; i<NUMCYCLES; i++) {
-		updateFlock(boids, nPoints);
-		applyNeighborForce(boids, nPoints);
+	// inspired largely from the cuda c programming guide
+	// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#warp-shuffle-functions
+	for (j=WARPSIZE/2;j>=1;j/=2){
+		ssumx[threadIdx.x] += ssumx[warpNum + (j xor warpId)];
+	}
+	for (j=WARPSIZE/2;j>=1;j/=2) {
+		ssumy[threadIdx.x] += ssumy[warpNum + (j xor warpId)];
+	}
+	for (j=WARPSIZE/2;j>=1;j/=2) {
+		scount[threadIdx.x] += scount[warpNum + (j xor warpId)];
 	}
 
+	if (warpId != 0) return;
+
+	sumX = ssumx[threadIdx.x];
+	sumY = ssumy[threadIdx.x];
+	count = scount[threadIdx.x];
+
+	velx = vel(b, i, 0, NP);
+	vely = vel(b, i, 1, NP);
+
+	if (count != 0) {
+
+		sumX /= count;
+		sumY /= count;
+
+		// centroid of neighborhood is now sumX, sumY
+		sumX -= posx;
+		sumY -= posy;
+
+		amp = sqrt(sumX * sumX + sumY * sumY);
+		sumX *= maxVel / amp;
+		sumY *= maxVel / amp;
+
+		sumX -= velx;
+		sumY -= vely;
+		amp = sqrt(sumX * sumX + sumY * sumY);
+
+		if (amp > maxForce) {
+			f = maxForce / amp;
+			sumX *= f;
+			sumY *= f;
+		}
+	}
+
+	posx += velx;
+	posy += vely;
+
+	pos(a, i, 0, NP) = posx;
+	pos(a, i, 1, NP) = posy;	
+
+	velx += sumX;
+	vely += sumY;
+
+	vel(a, i, 0, NP) = velx;
+	vel(a, i, 1, NP) = vely;
 }
 
-void printDiff(float *data1, float *data2, int iListLength, float fListTol)
-{
-		float h_x;
-		float h_y;
-		float g_x;
-		float g_y;
-    printf("Listing first %d Differences > %.6f...\n", iListLength, fListTol);
-    int i,j,u;
-    int error_count=0;
-        u = 1;
-        for (i = 0; i < iListLength; i++) 
-        {
-						h_x = pos(data1, i, 0, iListLength);
-						h_y = pos(data1, i, 1, iListLength);
-						g_x = pos(data2, i, 0, iListLength);
-						g_y = pos(data2, i, 1, iListLength);
+#if (!SHARED) && WARP
+// can only be compiled with -arch=compute_30 or higher
+// comments for cuUpdateApplyNeighbor apply
+// gives one boid to one sub-warp and reduces results in registers
+__global__ void cuUpdateApplyNeighborWarpReduce(float *a, float * b, int NP) {
 
-						
-            float fDiff = fabs(h_x - g_x) / g_x;
+	int i = blockIdx.x * (NUM_THREADS / WARPSIZE) + threadIdx.x / WARPSIZE;
+	int warpId = threadIdx.x % WARPSIZE;
+	int j;
+	float sumX = 0.0f, sumY = 0.0f;
+	int count = 0;
+	float sqX, sqY;
+	float posx, posy, velx, vely, jposx, jposy;
+	float diff;
+	const float neighborDistSQR = 50.0f * 50.0f;
+	float amp;
+	const float maxVel = 4.0f, maxForce = 0.03f;
+	float f;
 
-            if (fDiff > fListTol || isnan(fDiff)) 
-            {                
-                if (error_count < iListLength)
-                {
-                    if (u)
-                    {
-                        printf("\n  Row %d:\n", j);
-                    }
-                    printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_x, g_x, fDiff);
-                    u = 0;
-                }
-                error_count++;
-            }
+	if (i >= NP) return;
 
-					 fDiff = fabs(h_y - g_y) / g_y;
-						if (fDiff > fListTol || isnan(fDiff)) 
-            {                
-                if (error_count < iListLength)
-                {
-                    if (u)
-                    {
-                        printf("\n  Row %d:\n", j);
-                    }
-                    printf("    Loc(%d,%d)\tCPU=%.5f\tGPU=%.5f\tDiff=%.6f\n", i, j, h_y, g_y, fDiff);
-                    u = 0;
-                }
-                error_count++;
-            }
-        }
-    printf(" \n  Total Errors = %d\n\n", error_count);
+	posx = pos(b, i, 0, NP);
+	posy = pos(b, i, 1, NP);
+
+	for (j=warpId; j<NP; j+=WARPSIZE) {
+
+		if (i==j) continue;
+
+		jposx = pos(b, j, 0, NP);
+		jposy = pos(b, j, 1, NP);
+
+		sqX = posx - jposx;
+		sqX *= sqX;
+		sqY = posy - jposy;
+		sqY *= sqY;
+
+		diff = sqX + sqY;
+		if (diff > neighborDistSQR) continue;
+		sumX += jposx;
+		sumY += jposy;
+		count++;
+	}
+
+	// inspired largely from the cuda c programming guide
+	// http://docs.nvidia.com/cuda/cuda-c-programming-guide/#warp-shuffle-functions
+	for (j=WARPSIZE/2;j>=1;j/=2)
+		sumX += __shfl_xor(sumX, j, WARPSIZE);
+	for (j=WARPSIZE/2;j>=1;j/=2)
+		sumY += __shfl_xor(sumY, j, WARPSIZE);
+	for (j=WARPSIZE/2;j>=1;j/=2)
+		count += __shfl_xor(count, j, WARPSIZE);
+
+	if (warpId != 0) return;
+
+	velx = vel(b, i, 0, NP);
+	vely = vel(b, i, 1, NP);
+
+	if (count != 0) {
+
+		sumX /= count;
+		sumY /= count;
+
+		// centroid of neighborhood is now sumX, sumY
+		sumX -= posx;
+		sumY -= posy;
+
+		amp = sqrt(sumX * sumX + sumY * sumY);
+		sumX *= maxVel / amp;
+		sumY *= maxVel / amp;
+
+		sumX -= velx;
+		sumY -= vely;
+		amp = sqrt(sumX * sumX + sumY * sumY);
+
+		if (amp > maxForce) {
+			f = maxForce / amp;
+			sumX *= f;
+			sumY *= f;
+		}
+	}
+
+	posx += velx;
+	posy += vely;
+
+	pos(a, i, 0, NP) = posx;
+	pos(a, i, 1, NP) = posy;	
+
+	velx += sumX;
+	vely += sumY;
+
+	vel(a, i, 0, NP) = velx;
+	vel(a, i, 1, NP) = vely;
 }
-
+#endif
