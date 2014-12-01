@@ -22,6 +22,7 @@ Managed Memory 		512 threads - 8 per warp		~ 69ms
 Double Buffer Warp Reduce Kernel:
 Explicit Copy		512 threads - 4 per warp		~ 55ms
 Managed Memory 		512 threads - 4 per warp		~ 56ms
+-----------------------------------------------------------
 
 -Titan-
 Original Kernel:

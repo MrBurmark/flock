@@ -19,13 +19,13 @@
 #define MANMEM 0
 #endif
 #ifndef DOUBLEBUFFER
-#define DOUBLEBUFFER 1
+#define DOUBLEBUFFER 0
 #endif
 #ifndef SHARED // takes precedence over WARP
-#define SHARED 1 // requires DOUBLEBUFFER
+#define SHARED 0 // requires DOUBLEBUFFER
 #endif
 #ifndef WARP // will not compile if architecture not 30 or higher with this option
-#define WARP 1 // requires DOUBLEBUFFER
+#define WARP 0 // requires DOUBLEBUFFER
 #endif
 #ifndef WARPSIZE
 #define WARPSIZE 16 // power of 2, <= 32, evenly divides NUM_THREADS
