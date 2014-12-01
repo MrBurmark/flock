@@ -8,7 +8,7 @@
 
 #define NUMCYCLES 500
 
-#define NUM_THREADS 128
+#define NUM_THREADS 64
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */

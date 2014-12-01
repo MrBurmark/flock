@@ -45,7 +45,7 @@ echo ------------------------------------------------------
 date
 
 # link to executable
-EXE="./cuflock in1024"
+EXE="./cuflock in1000"
 # execute!
 $EXE
 

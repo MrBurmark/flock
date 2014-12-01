@@ -85,6 +85,7 @@ int main(int argc, char** argv)
 	dumpBoids(h_boids, nPoints);
 
 	computeGold(g_boids, nPoints);
+
 	printDiff(h_boids, g_boids, nPoints, .01);
     // clean up memory
     free(h_boids);
