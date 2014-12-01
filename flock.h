@@ -34,6 +34,7 @@
 #define NUM_THREADS 128 // 128 good for most
 #endif
 
+// Look in test.txt for run configurations and times
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */
