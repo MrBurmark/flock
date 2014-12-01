@@ -116,11 +116,11 @@ int main(int argc, char** argv)
 		applyNeighborForceTime += t2 - t1;
 
 #else
-#if !WARP
+#if !WARP && !SHARED
 		cuUpdateApplyNeighbor<<<ceil(nPoints / (double)NUM_THREADS), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
 #elif SHARED
 		cuUpdateApplyNeighborWarpReduceShared<<<ceil(nPoints / (double)(NUM_THREADS / WARPSIZE)), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
-#else
+#elif WARP
 		cuUpdateApplyNeighborWarpReduce<<<ceil(nPoints / (double)(NUM_THREADS / WARPSIZE)), NUM_THREADS>>>(d_boidsA, d_boidsB, nPoints);
 #endif
 		// swap buffers

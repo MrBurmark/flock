@@ -40,3 +40,4 @@ Managed Memory 		128-512 threads - 16 per warp	~ 27ms
 Double Buffer Warp Reduce Kernel:
 Explicit Copy		128-512 threads - 16 per warp	~ 23ms
 Managed Memory 		256 threads - 16 per warp		~ 25ms
+----------------------------------------------------------
