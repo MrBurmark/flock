@@ -34,7 +34,6 @@
 #define NUM_THREADS 128 // 128 good for most
 #endif
 
-// see text.txt for fastest configs with different gpus
 
 /* macros for accessing array of 2-D positions, velocities and accelerations */
 /* DATA is particle array */

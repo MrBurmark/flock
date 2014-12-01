@@ -172,6 +172,7 @@ int main(int argc, char** argv)
 
 #if CHECK
 	computeGold(g_boids, nPoints);
+
 	printDiff(h_boids, g_boids, nPoints, .01);
 #endif
 
