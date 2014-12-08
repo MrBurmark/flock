@@ -56,6 +56,9 @@ int main(int argc, char** argv)
 	printf("Num Cycles %i - ", NUMCYCLES);
 	printf("Cuda - %d points, %i threads\n", nPoints, NUM_THREADS);
 
+	gettimeofday(&tv, NULL);
+	t0 = tv.tv_sec*1e6 + tv.tv_usec;
+
 #if !MANMEM
 	h_boids = (float *) calloc(nPoints*6, sizeof(float));
 
@@ -82,9 +85,6 @@ int main(int argc, char** argv)
 
     g_boids = (float *) calloc(nPoints*6, sizeof(float));
 	memcpy(g_boids, h_boids, (nPoints * 6) * sizeof(float));
-
-    gettimeofday(&tv, NULL);
-	t0 = tv.tv_sec*1e6 + tv.tv_usec;
 
 #if !MANMEM
     // copy host memory to device

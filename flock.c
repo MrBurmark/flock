@@ -22,6 +22,13 @@ int main(int argc, char **argv) {
 	FILE *fp = fopen(argv[1], "r");
 	fscanf(fp, "%d", &nPoints);
 	printf("%d points\n", nPoints);
+
+	// set up timer
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	double t0 = tv.tv_sec*1e6 + tv.tv_usec;
+	double t1, t2;
+
 	boids = (float *) calloc(nPoints*6, sizeof(float));
 	loadBoids(fp, boids, nPoints);
 
@@ -31,12 +38,6 @@ int main(int argc, char **argv) {
 		acc(boids, i, 0, nPoints) = 0.;
 		acc(boids, i, 1, nPoints) = 0.;
 	}
-
-	// set up timer
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	double t0 = tv.tv_sec*1e6 + tv.tv_usec;
-	double t1, t2;
 
 	t2 = tv.tv_sec*1e6 + tv.tv_usec;
 	double updateFlockTime = 0.;
