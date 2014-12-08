@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	int nwold=-1, ncold = -1, npold = -1, ntold = -1;
 	int ok = 1;
 	double uf=0.0, anf=0.0, tt=0.0;
-	struct run data[3][9][5];
+	struct run data[4][9][5];
 	FILE *fp;
 
 	if (argc != 2) exit(1);
@@ -55,9 +55,10 @@ int main(int argc, char **argv) {
 		ok = fscanf(fp, "Num Cycles %i - Cuda - %d points, %i threads\nupdateFlock: %lf applyNeighborForce %lf total %lf\n", &nc, &np, &nt, &uf, &anf, &tt);
 
 		if (ok == 6) {
-			if (np == 1000) i = 0;
-			else if (np == 1024) i = 1;
-			else if (np == 1028) i = 2;
+			if (np == 257) i = 0;
+			else if (np == 1000) i = 1;
+			else if (np == 1024) i = 2;
+			else if (np == 1028) i = 3;
 			else continue;
 
 			if (nt == 4) j = 0;
@@ -87,9 +88,10 @@ int main(int argc, char **argv) {
 		ok = fscanf(fp, "Double Buffered - Shared Warp Reduction %i - Num Cycles %i - Cuda - %i points, %i threads\nupdateFlock and applyNeighborForce %lf total %lf\n", &nw, &nc, &np, &nt, &anf, &tt);
 
 		if (ok == 6) {
-			if (np == 1000) i = 0;
-			else if (np == 1024) i = 1;
-			else if (np == 1028) i = 2;
+			if (np == 257) i = 0;
+			else if (np == 1000) i = 1;
+			else if (np == 1024) i = 2;
+			else if (np == 1028) i = 3;
 			else continue;
 
 			if (nt == 4) j = 0;
@@ -123,10 +125,11 @@ int main(int argc, char **argv) {
 
 #if BASIC
 	fprintf(fp, "update flock times\n");
-	for (i=0; i < 3; i++) {
-		if (i == 0) np = 1000;
-		else if (i == 1) np = 1024;
-		else if (i == 2) np = 1028;
+	for (i=0; i < 4; i++) {
+		if (i == 0) np = 257;
+		else if (i == 1) np = 1000;
+		else if (i == 2) np = 1024;
+		else if (i == 3) np = 1028;
 		fprintf(fp, "input in%i\n", np);
 		for (j=0; j< 9; j++) {
 			if (j == 0) nt = 4;
@@ -149,10 +152,11 @@ int main(int argc, char **argv) {
 #endif
 
 	fprintf(fp, "apply neighbor force times\n");
-	for (i=0; i < 3; i++) {
-		if (i == 0) np = 1000;
-		else if (i == 1) np = 1024;
-		else if (i == 2) np = 1028;
+	for (i=0; i < 4; i++) {
+		if (i == 0) np = 257;
+		else if (i == 1) np = 1000;
+		else if (i == 2) np = 1024;
+		else if (i == 3) np = 1028;
 		fprintf(fp, "input in%i\n", np);
 		for (j=0; j< 9; j++) {
 			if (j == 0) nt = 4;
@@ -174,10 +178,11 @@ int main(int argc, char **argv) {
 	fprintf(fp, "\n");
 
 	fprintf(fp, "total times\n");
-	for (i=0; i < 3; i++) {
-		if (i == 0) np = 1000;
-		else if (i == 1) np = 1024;
-		else if (i == 2) np = 1028;
+	for (i=0; i < 4; i++) {
+		if (i == 0) np = 257;
+		else if (i == 1) np = 1000;
+		else if (i == 2) np = 1024;
+		else if (i == 3) np = 1028;
 		fprintf(fp, "input in%i\n", np);
 		for (j=0; j< 9; j++) {
 			if (j == 0) nt = 4;
